@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Administrasi Rumah Pemberdayaan Masyarakat (RPM)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- LOGIN MODAL (Overlay) -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4 border border-slate-100">
+            <div class="text-center mb-6">
+                <img src="Logo_Rumah_Pemberdayaan_Masyarakat__1_-removebg-preview(1).png" alt="Logo RPM" class="h-16 mx-auto mb-3 object-contain">
+                <h2 class="text-2xl font-bold text-slate-900">Portal Administrasi RPM</h2>
+                <p class="text-sm text-slate-500 mt-1">Rumah Pemberdayaan Masyarakat</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Password Admin</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="adminPassword" required placeholder="Masukkan password admin" 
+                            class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                    </div>
+                    <p id="loginError" class="text-xs text-rose-500 mt-1.5 hidden font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>Password salah! Silakan coba lagi.</p>
+                </div>
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30 transition duration-200 flex items-center justify-center gap-2">
+                    <span>Masuk Sistem</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER (Hidden until login) -->
+    <div id="appContainer" class="min-h-full flex flex-col hidden">
+        
+        <!-- KOP SURAT RESMI (Tampil di layar & cetak) -->
+        <div class="bg-white border-b-4 border-amber-400 shadow-sm py-4 px-4 sm:px-8">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <img src="Logo_Rumah_Pemberdayaan_Masyarakat__1_-removebg-preview(1).png" alt="Logo Resmi RPM" class="h-16 sm:h-20 object-contain">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black text-blue-900 tracking-wide uppercase">Rumah Pemberdayaan Masyarakat</h2>
+                        <p class="text-xs sm:text-sm font-semibold text-amber-600 italic">"Bersama Berdaya Menuju Sejahtera"</p>
+                        <p class="text-xs text-slate-500 mt-1">Pusat Pelatihan, Pengembangan Warga & Pemberdayaan Ekonomi Kreatif</p>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-600 border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0 sm:pl-4 space-y-1">
+                    <p><i class="fa-solid fa-globe text-blue-600 mr-1.5"></i> www.rumahpemberdayaan.com</p>
+                    <p><i class="fa-solid fa-share-nodes text-blue-600 mr-1.5"></i> Sosmed: Rumah Pemberdayaan</p>
+                    <p><i class="fa-solid fa-shield-halved text-amber-500 mr-1.5"></i> Portal Resmi Administrasi</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOP NAVIGATION -->
+        <header class="bg-blue-900 text-white sticky top-0 z-30 no-print shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+                <div class="flex items-center space-x-2 text-sm font-medium">
+                    <span class="px-2.5 py-1 bg-amber-400 text-slate-900 rounded-lg text-xs font-bold">ADMINISTRASI</span>
+                    <span class="text-blue-100 hidden sm:inline">| Sistem Terpadu RPM</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.print()" class="px-4 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs font-bold rounded-lg transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak / PDF Resmi</span>
+                    </button>
+                    <button onclick="handleLogout()" class="px-4 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-semibold rounded-lg transition flex items-center gap-1.5 border border-rose-500/30">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Keluar</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD LAYOUT -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow flex flex-col md:flex-row gap-8">
+            
+            <!-- SIDEBAR MENU -->
+            <aside class="w-full md:w-64 flex-shrink-0 no-print">
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm sticky top-24">
+                    <nav class="space-y-1.5">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-blue-50 text-blue-700">
+                            <i class="fa-solid fa-chart-pie w-5"></i>
+                            <span>Dashboard Utama</span>
+                        </button>
+                        <button onclick="switchTab('warga')" id="nav-warga" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                            <i class="fa-solid fa-users w-5"></i>
+                            <span>Data Warga/Peserta</span>
+                        </button>
+                        <button onclick="switchTab('program')" id="nav-program" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                            <i class="fa-solid fa-calendar-days w-5"></i>
+                            <span>Program Pelatihan</span>
+                        </button>
+                        <button onclick="switchTab('keuangan')" id="nav-keuangan" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                            <i class="fa-solid fa-wallet w-5"></i>
+                            <span>Kas & Keuangan</span>
+                        </button>
+                        <button onclick="switchTab('inventaris')" id="nav-inventaris" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                            <i class="fa-solid fa-boxes-stacked w-5"></i>
+                            <span>Inventaris Barang</span>
+                        </button>
+                        <button onclick="switchTab('surat')" id="nav-surat" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                            <i class="fa-solid fa-envelope-open-text w-5"></i>
+                            <span>Surat-Menyurat & Arsip</span>
+                        </button>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-grow">
+                
+                <!-- TAB 1: DASHBOARD -->
+                <div id="tab-dashboard" class="space-y-6">
+                    <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-amber-400/20 rounded-full blur-2xl pointer-events-none"></div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Selamat Datang, Administrator!</h2>
+                        <p class="text-blue-100 text-sm md:text-base max-w-2xl">Kelola data warga, program pemberdayaan, keuangan, dan inventaris Rumah Pemberdayaan Masyarakat secara praktis dan terintegrasi.</p>
+                    </div>
+
+                    <!-- STATS CARDS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Total Warga</p>
+                                <h3 id="statWarga" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Program Aktif</p>
+                                <h3 id="statProgram" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Saldo Kas</p>
+                                <h3 id="statSaldo" class="text-2xl font-bold text-slate-900 mt-1">Rp 0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Total Aset</p>
+                                <h3 id="statInventaris" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QUICK OVERVIEW SECTION -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-blue-600"></i>
+                            <span>Panduan Singkat Aplikasi</span>
+                        </h3>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 font-semibold text-xs mt-0.5">1</span>
+                                <span>Gunakan menu sebelah kiri untuk berpindah modul (Data Warga, Program, Keuangan, & Inventaris).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 font-semibold text-xs mt-0.5">2</span>
+                                <span>Semua data dapat ditambahkan, diedit, maupun dihapus secara langsung dan otomatis tersimpan di memori lokal peramban.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 font-semibold text-xs mt-0.5">3</span>
+                                <span>Gunakan tombol <strong>Cetak / PDF</strong> di sudut kanan atas untuk mencetak laporan rekapitulasi lengkap.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- TAB 2: DATA WARGA -->
+                <div id="tab-warga" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Data Warga / Peserta</h2>
+                            <p class="text-sm text-slate-500">Daftar warga binaan dan peserta pelatihan pemberdayaan masyarakat.</p>
+                        </div>
+                        <button onclick="openModal('warga')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Tambah Warga Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                        <th class="py-3.5 px-6">No</th>
+                                        <th class="py-3.5 px-6">Nama Lengkap</th>
+                                        <th class="py-3.5 px-6">NIK</th>
+                                        <th class="py-3.5 px-6">No. Telepon</th>
+                                        <th class="py-3.5 px-6">Pelatihan/Keahlian</th>
+                                        <th class="py-3.5 px-6 text-center no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableWargaBody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: PROGRAM PELATIHAN -->
+                <div id="tab-program" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Program Pelatihan</h2>
+                            <p class="text-sm text-slate-500">Jadwal dan daftar kegiatan pemberdayaan masyarakat.</p>
+                        </div>
+                        <button onclick="openModal('program')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah Program</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                        <th class="py-3.5 px-6">No</th>
+                                        <th class="py-3.5 px-6">Nama Program</th>
+                                        <th class="py-3.5 px-6">Kategori</th>
+                                        <th class="py-3.5 px-6">Jadwal Pelaksanaan</th>
+                                        <th class="py-3.5 px-6">Status</th>
+                                        <th class="py-3.5 px-6 text-center no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableProgramBody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: KEUANGAN -->
+                <div id="tab-keuangan" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Kas & Keuangan RPM</h2>
+                            <p class="text-sm text-slate-500">Pencatatan arus kas masuk dan kas keluar organisasi.</p>
+                        </div>
+                        <button onclick="openModal('keuangan')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Tambah Transaksi</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                        <th class="py-3.5 px-6">Tanggal</th>
+                                        <th class="py-3.5 px-6">Keterangan</th>
+                                        <th class="py-3.5 px-6">Tipe</th>
+                                        <th class="py-3.5 px-6">Jumlah (Rp)</th>
+                                        <th class="py-3.5 px-6 text-center no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableKeuanganBody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: INVENTARIS -->
+                <div id="tab-inventaris" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Inventaris Barang</h2>
+                            <p class="text-sm text-slate-500">Daftar sarana, prasarana, dan alat perlengkapan RPM.</p>
+                        </div>
+                        <button onclick="openModal('inventaris')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Tambah Barang</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                        <th class="py-3.5 px-6">No</th>
+                                        <th class="py-3.5 px-6">Nama Barang</th>
+                                        <th class="py-3.5 px-6">Kondisi</th>
+                                        <th class="py-3.5 px-6">Jumlah</th>
+                                        <th class="py-3.5 px-6 text-center no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableInventarisBody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: SURAT-MENYURAT & ARSIP -->
+                <div id="tab-surat" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">Administrasi Surat-Menyurat</h2>
+                            <p class="text-sm text-slate-500">Pengelolaan arsip surat masuk, surat keluar, dan generator surat resmi.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openModal('surat')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>Catat Surat Baru</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TABS PILIHAN -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex border-b border-slate-200 mb-6 gap-6">
+                            <button onclick="switchSuratSub('arsip')" id="subnav-arsip" class="pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">Arsip Log Surat</button>
+                            <button onclick="switchSuratSub('generator')" id="subnav-generator" class="pb-3 text-sm font-semibold text-slate-500 hover:text-slate-900 transition">Generator Surat Resmi Siap Cetak</button>
+                        </div>
+
+                        <!-- KONTEN 1: TABEL ARSIP SURAT -->
+                        <div id="sub-arsip" class="space-y-4">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                            <th class="py-3.5 px-6">Tanggal</th>
+                                            <th class="py-3.5 px-6">Nomor Surat</th>
+                                            <th class="py-3.5 px-6">Jenis</th>
+                                            <th class="py-3.5 px-6">Perihal</th>
+                                            <th class="py-3.5 px-6">Asal / Tujuan</th>
+                                            <th class="py-3.5 px-6 text-center no-print">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableSuratBody" class="divide-y divide-slate-100 text-sm">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- KONTEN 2: GENERATOR SURAT RESMI -->
+                        <div id="sub-generator" class="space-y-6 hidden">
+                            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 no-print">
+                                <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-wand-magic-sparkles text-blue-600 mr-2"></i>Pilih Template Surat Resmi Yayasan</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <button onclick="loadLetterTemplate('undangan')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Undangan</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('kegiatan')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Ijin Kegiatan</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('kerjasama')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Kerjasama</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('pinjamtempat')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Pinjam Tempat</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('pinjamalat')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Pinjam Alat</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('keterangan')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Keterangan</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('donatur')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Donatur</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('terimakasih')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Terima Kasih</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('ijin')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Ijin (Pribadi)</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('mengundurkandiri')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Pengunduran Diri</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('pernyataan')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Pernyataan</p>
+                                    </button>
+                                    <button onclick="loadLetterTemplate('perjanjian')" class="p-3 bg-white hover:border-blue-500 border border-slate-200 rounded-xl text-left transition shadow-sm group">
+                                        <p class="font-bold text-slate-900 group-hover:text-blue-600 text-xs">Surat Perjanjian</p>
+                                    </button>
+                                </div>
+
+                                <div class="border-t border-slate-200 pt-4 mt-4 space-y-4">
+                                    <h4 class="font-bold text-slate-900 text-sm">Sesuaikan Isi Naskah & Penandatangan Surat:</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nomor Surat</label>
+                                            <input type="text" id="genNoSurat" value="045/RPM/VI/2026" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Lampiran</label>
+                                            <input type="text" id="genLampiran" value="1 Berkas" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Perihal</label>
+                                            <input type="text" id="genPerihal" value="Undangan Pelatihan Keterampilan Warga" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Ditujukan Kepada</label>
+                                            <input type="text" id="genTujuan" value="Bapak/Ibu Warga Binaan RPM di Tempat" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tempat Surat</label>
+                                            <input type="text" id="genTempat" value="Jakarta" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Paragraf Isi / Badan Surat</label>
+                                        <textarea id="genIsi" rows="4" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">Sehubungan dengan program pemberdayaan masyarakat bulan ini, Rumah Pemberdayaan Masyarakat (RPM) akan menyelenggarakan kegiatan pelatihan keterampilan produktif. Oleh karena itu, kami mengundang Bapak/Ibu sekalian untuk hadir pada kegiatan yang akan dilaksanakan pada hari Sabtu mendatang pukul 09.00 WIB bertempat di Aula Utama RPM.</textarea>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200 pt-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Ketua Umum</label>
+                                            <input type="text" id="genKetua" value="Syaiful Umar, S.Pd" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Sekretaris Umum</label>
+                                            <input type="text" id="genSekretaris" value="Sigid Khoironi, SE" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button onclick="window.print()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow transition flex items-center gap-2">
+                                            <i class="fa-solid fa-print"></i>
+                                            <span>Cetak / Download PDF Surat Ini</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PREVIEW SURAT RESMI CETAK -->
+                            <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm print-letter-preview">
+                                <div class="text-center border-b-4 border-amber-400 pb-4 mb-6">
+                                    <div class="flex items-center justify-between">
+                                        <img src="Logo_Rumah_Pemberdayaan_Masyarakat__1_-removebg-preview(1).png" alt="Logo RPM" class="h-16 object-contain">
+                                        <div class="text-center flex-grow px-4">
+                                            <h2 class="text-xl font-black text-blue-900 uppercase">Rumah Pemberdayaan Masyarakat (RPM)</h2>
+                                            <p class="text-xs font-semibold text-amber-600 italic">"Bersama Berdaya Menuju Sejahtera"</p>
+                                            <p class="text-xs text-slate-500">Website: www.rumahpemberdayaan.com | Email: admin@rumahpemberdayaan.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4 text-sm text-slate-900 leading-relaxed">
+                                    <div class="grid grid-cols-2 gap-4 pb-2">
+                                        <div>
+                                            <table class="space-y-1">
+                                                <tr><td class="font-semibold w-24">Nomor</td><td>: <span id="previewNoSurat">045/RPM/VI/2026</span></td></tr>
+                                                <tr><td class="font-semibold">Lampiran</td><td>: <span id="previewLampiran">1 Berkas</span></td></tr>
+                                                <tr><td class="font-semibold">Perihal</td><td>: <span id="previewPerihal">Undangan Pelatihan Keterampilan Warga</span></td></tr>
+                                            </table>
+                                        </div>
+                                        <div class="text-right">
+                                            <p><span id="previewTempat">Jakarta</span>, <span id="previewTanggal">12 Juni 2026</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4">
+                                        <p class="font-semibold">Kepada Yth,</p>
+                                        <p id="previewTujuan" class="font-medium">Bapak/Ibu Warga Binaan RPM di Tempat</p>
+                                    </div>
+
+                                    <div class="pt-2 text-justify">
+                                        <p>Dengan hormat,</p>
+                                        <p id="previewIsi" class="mt-2 indent-8">Sehubungan dengan program pemberdayaan masyarakat bulan ini, Rumah Pemberdayaan Masyarakat (RPM) akan menyelenggarakan kegiatan pelatihan keterampilan produktif. Oleh karena itu, kami mengundang Bapak/Ibu sekalian untuk hadir pada kegiatan yang akan dilaksanakan pada hari Sabtu mendatang pukul 09.00 WIB bertempat di Aula Utama RPM.</p>
+                                    </div>
+
+                                    <div class="pt-4">
+                                        <p>Demikian undangan ini kami sampaikan, atas perhatian dan kehadiran Bapak/Ibu kami ucapkan terima kasih.</p>
+                                    </div>
+
+                                    <div class="pt-8 flex justify-between items-center text-center">
+                                        <div class="w-64">
+                                            <p class="font-medium">Sekretaris Umum</p>
+                                            <div class="h-20"></div>
+                                            <p id="previewSekretaris" class="font-bold underline">Sigid Khoironi, SE</p>
+                                        </div>
+                                        <div class="w-64">
+                                            <p class="font-medium">Ketua Umum</p>
+                                            <div class="h-20"></div>
+                                            <p id="previewKetua" class="font-bold underline">Syaiful Umar, S.Pd</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- GENERAL INPUT / EDIT MODAL -->
+    <div id="dataModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 mx-4 border border-slate-100">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modalTitle" class="text-xl font-bold text-slate-900">Form Data</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="dataForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <input type="hidden" id="formType">
+                <input type="hidden" id="formIndex" value="-1">
+                <div id="modalFields" class="space-y-4">
+                    <!-- Dynamic inputs injected by JS -->
+                </div>
+                <div class="pt-4 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md transition">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOM NOTIFICATION BOX -->
+    <div id="customAlert" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-medium border border-slate-700">
+            <i id="alertIcon" class="fa-solid fa-circle-check text-amber-400 text-lg"></i>
+            <span id="alertMessage">Pesan berhasil disimpan.</span>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Default LocalStorage Initial Data if empty
+        const defaultData = {
+            warga: [
+                { nama: "Siti Aminah", nik: "3201123456780001", telp: "081234567890", keahlian: "Menjahit & Konveksi" },
+                { nama: "Budi Santoso", nik: "3201123456780002", telp: "085678901234", keahlian: "Budidaya Lele" },
+                { nama: "Dewi Lestari", nik: "3201123456780003", telp: "081987654321", keahlian: "Kuliner & Kue Basah" }
+            ],
+            program: [
+                { nama: "Pelatihan Keterampilan Menjahit Dasar", kategori: "Keterampilan", jadwal: "15-20 Juni 2026", status: "Aktif" },
+                { nama: "Penyuluhan UMKM & Pemasaran Digital", kategori: "Bisnis", jadwal: "10 Juli 2026", status: "Perencanaan" }
+            ],
+            keuangan: [
+                { tanggal: "2026-06-01", keterangan: "Dana Hibah Pemberdayaan Desa", tipe: "Masuk", jumlah: 15000000 },
+                { tanggal: "2026-06-03", keterangan: "Pembelian Bahan Pelatihan Menjahit", tipe: "Keluar", jumlah: 2500000 }
+            ],
+            inventaris: [
+                { nama: "Mesin Jahit High Speed", kondisi: "Baik", jumlah: 5 },
+                { nama: "Laptop Operasional RPM", kondisi: "Baik", jumlah: 2 },
+                { nama: "Proyektor Infocus", kondisi: "Perbaikan", jumlah: 1 }
+            ],
+            surat: [
+                { tanggal: "2026-06-02", nomor: "012/RPM-MSK/VI/2026", jenis: "Surat Masuk", perihal: "Permohonan Kerjasama Pelatihan", asalTujuan: "Dinas Koperasi & UMKM" },
+                { tanggal: "2026-06-05", nomor: "045/RPM/VI/2026", jenis: "Surat Keluar", perihal: "Undangan Pelatihan Keterampilan Warga", asalTujuan: "Warga Binaan RPM" }
+            ]
+        };
+
+        // Load or initialize state
+        let db = JSON.parse(localStorage.getItem('rpm_db')) || defaultData;
+        if (!db.surat) db.surat = defaultData.surat;
+
+        function saveDB() {
+            localStorage.setItem('rpm_db', JSON.stringify(db));
+            renderAll();
+        }
+
+        // Authentication Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPassword').value;
+            if (pass === 'rumah123#') {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                renderAll();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'warga', 'program', 'keuangan', 'inventaris', 'surat'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (navBtn) {
+                    navBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 hover:text-slate-900";
+                }
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-blue-50 text-blue-700";
+            }
+        }
+
+        // Sub Tab Surat Switching
+        function switchSuratSub(subName) {
+            if (subName === 'arsip') {
+                document.getElementById('sub-arsip').classList.remove('hidden');
+                document.getElementById('sub-generator').classList.add('hidden');
+                document.getElementById('subnav-arsip').className = "pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition";
+                document.getElementById('subnav-generator').className = "pb-3 text-sm font-semibold text-slate-500 hover:text-slate-900 transition";
+            } else {
+                document.getElementById('sub-arsip').classList.add('hidden');
+                document.getElementById('sub-generator').classList.remove('hidden');
+                document.getElementById('subnav-generator').className = "pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition";
+                document.getElementById('subnav-arsip').className = "pb-3 text-sm font-semibold text-slate-500 hover:text-slate-900 transition";
+            }
+        }
+
+        // Live Generator sync
+        ['genNoSurat', 'genLampiran', 'genPerihal', 'genTujuan', 'genIsi', 'genTempat', 'genKetua', 'genSekretaris'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', () => {
+                    const previewMap = {
+                        genNoSurat: 'previewNoSurat',
+                        genLampiran: 'previewLampiran',
+                        genPerihal: 'previewPerihal',
+                        genTujuan: 'previewTujuan',
+                        genIsi: 'previewIsi',
+                        genTempat: 'previewTempat',
+                        genKetua: 'previewKetua',
+                        genSekretaris: 'previewSekretaris'
+                    };
+                    document.getElementById(previewMap[id]).innerText = el.value;
+                });
+            }
+        });
+
+        function loadLetterTemplate(type) {
+            if (type === 'undangan') {
+                document.getElementById('genNoSurat').value = "045/RPM/VI/2026";
+                document.getElementById('genLampiran').value = "1 Berkas";
+                document.getElementById('genPerihal').value = "Undangan Pelatihan Keterampilan Warga";
+                document.getElementById('genTujuan').value = "Bapak/Ibu Warga Binaan RPM di Tempat";
+                document.getElementById('genIsi').value = "Sehubungan dengan program pemberdayaan masyarakat bulan ini, Rumah Pemberdayaan Masyarakat (RPM) akan menyelenggarakan kegiatan pelatihan keterampilan produktif. Oleh karena itu, kami mengundang Bapak/Ibu sekalian untuk hadir pada kegiatan yang akan dilaksanakan pada hari Sabtu mendatang pukul 09.00 WIB bertempat di Aula Utama RPM.";
+            } else if (type === 'kegiatan') {
+                document.getElementById('genNoSurat').value = "046/RPM-IK/VI/2026";
+                document.getElementById('genLampiran').value = "1 Proposal";
+                document.getElementById('genPerihal').value = "Permohonan Ijin Pelaksanaan Kegiatan";
+                document.getElementById('genTujuan').value = "Yth. Kepala Kelurahan / Aparat Setempat di Tempat";
+                document.getElementById('genIsi').value = "Dalam rangka melaksanakan program pembinaan dan pemberdayaan pemuda serta warga sekitar, Rumah Pemberdayaan Masyarakat (RPM) bermaksud menyelenggarakan kegiatan sosial kemasyarakatan yang akan dilaksanakan pada hari Minggu, 21 Juni 2026 bertempat di Lapangan Warga RT 05. Sehubungan dengan hal tersebut, kami memohon ijin serta dukungan dari Bapak/Ibu pimpinan instansi/wilayah setempat.";
+            } else if (type === 'kerjasama') {
+                document.getElementById('genNoSurat').value = "047/RPM-KS/VI/2026";
+                document.getElementById('genLampiran').value = "Nota Kesepahaman";
+                document.getElementById('genPerihal').value = "Penawaran Kerjasama Program Pemberdayaan UMKM";
+                document.getElementById('genTujuan').value = "Pimpinan Mitra Strategis / Instansi Terkait di Tempat";
+                document.getElementById('genIsi').value = "Rumah Pemberdayaan Masyarakat (RPM) senantiasa berkomitmen mengembangkan kemandirian ekonomi warga. Melalui surat ini, kami bermaksud mengajukan penawaran kerjasama dalam bidang pelatihan kewirausahaan dan pemasaran digital bagi pelaku UMKM binaan kami. Besar harapan kami agar kerjasama ini dapat segera direalisasikan demi kemajuan bersama.";
+            } else if (type === 'pinjamtempat') {
+                document.getElementById('genNoSurat').value = "048/RPM-PT/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Permohonan Peminjaman Tempat";
+                document.getElementById('genTujuan').value = "Pengelola Gedung Serbaguna / Instansi Terkait di Tempat";
+                document.getElementById('genIsi').value = "Sehubungan dengan akan diadakannya kegiatan Pelatihan Akbar Pemberdayaan Warga oleh Rumah Pemberdayaan Masyarakat (RPM) pada tanggal 25 Juni 2026, kami bermaksud meminjam fasilitas Aula/Gedung yang Bapak/Ibu kelola untuk keperluan kelancaran acara tersebut.";
+            } else if (type === 'pinjamalat') {
+                document.getElementById('genNoSurat').value = "049/RPM-PA/VI/2026";
+                document.getElementById('genLampiran').value = "Daftar Alat";
+                document.getElementById('genPerihal').value = "Permohonan Peminjaman Alat / Sarana";
+                document.getElementById('genTujuan').value = "Pimpinan Instansi / Mitra Penyedia Alat di Tempat";
+                document.getElementById('genIsi').value = "Dalam rangka menunjang kegiatan praktik pelatihan keterampilan menjahit dan pertukangan bagi warga binaan Rumah Pemberdayaan Masyarakat (RPM), kami memohon bantuan peminjaman beberapa unit alat penunjang sebagaimana terlampir yang akan dipergunakan selama 3 hari terhitung mulai tanggal 20 Juni 2026.";
+            } else if (type === 'keterangan') {
+                document.getElementById('genNoSurat').value = "050/RPM-KET/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Keterangan Aktif Peserta";
+                document.getElementById('genTujuan').value = "Instansi Terkait / Yang Bersangkutan";
+                document.getElementById('genIsi').value = "Yang bertandatangan di bawah ini Pengurus Rumah Pemberdayaan Masyarakat (RPM) menerangkan dengan sebenarnya bahwa warga binaan kami aktif mengikuti pelatihan keterampilan dan pemberdayaan ekonomi kreatif dengan hasil yang sangat memuaskan.";
+            } else if (type === 'donatur') {
+                document.getElementById('genNoSurat').value = "051/RPM-DON/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Konfirmasi & Keterangan Donatur Resmi";
+                document.getElementById('genTujuan').value = "Bapak/Ibu Donatur / Dermawan di Tempat";
+                document.getElementById('genIsi').value = "Bersamaan dengan surat ini, kami atas nama Pengurus Rumah Pemberdayaan Masyarakat (RPM) menyampaikan apresiasi setinggi-tingginya serta konfirmasi resmi atas partisipasi Bapak/Ibu sebagai donatur utama dalam mendukung program kemandirian dan kesejahteraan warga binaan kami.";
+            } else if (type === 'terimakasih') {
+                document.getElementById('genNoSurat').value = "052/RPM-UTK/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Ucapan Terima Kasih";
+                document.getElementById('genTujuan').value = "Mitra / Narasumber / Donatur di Tempat";
+                document.getElementById('genIsi').value = "Atas terselenggaranya program pelatihan pemberdayaan masyarakat dengan sukses dan lancar, kami segenap pengurus Rumah Pemberdayaan Masyarakat (RPM) menyampaikan ucapan terima kasih yang sebesar-besarnya atas dukungan, tenaga, serta waktu yang telah diberikan demi kemajuan warga binaan kami.";
+            } else if (type === 'ijin') {
+                document.getElementById('genNoSurat').value = "053/RPM-IJ/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Ijin Tidak Hadir Kegiatan";
+                document.getElementById('genTujuan').value = "Pengurus / Panitia Pelatihan RPM di Tempat";
+                document.getElementById('genIsi').value = "Dengan surat ini, saya memberitahukan bahwa saya tidak dapat hadir mengikuti kegiatan pelatihan yang diselenggarakan oleh Rumah Pemberdayaan Masyarakat (RPM) pada hari ini dikarenakan ada halangan yang tidak dapat ditinggalkan. Mohon maklum dan terima kasih.";
+            } else if (type === 'mengundurkandiri') {
+                document.getElementById('genNoSurat').value = "054/RPM-MOD/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Pengunduran Diri";
+                document.getElementById('genTujuan').value = "Pengurus Rumah Pemberdayaan Masyarakat (RPM)";
+                document.getElementById('genIsi').value = "Melalui surat ini, saya menyampaikan permohonan pengunduran diri dari kepengurusan / keanggotaan kelompok binaan Rumah Pemberdayaan Masyarakat (RPM) terhitung sejak tanggal surat ini dibuat, dikarenakan kesibukan pribadi. Terima kasih atas kesempatan dan bimbingan selama ini.";
+            } else if (type === 'pernyataan') {
+                document.getElementById('genNoSurat').value = "055/RPM-PRN/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Pernyataan Komitmen Warga";
+                document.getElementById('genTujuan').value = "Pengurus Rumah Pemberdayaan Masyarakat (RPM)";
+                document.getElementById('genIsi').value = "Yang bertandatangan di bawah ini menyatakan dengan sesungguhnya bahwa saya akan mematuhi segala ketentuan dan tata tertib yang berlaku selama mengikuti program pembinaan dan pelatihan di Rumah Pemberdayaan Masyarakat (RPM) serta menjaga nama baik organisasi.";
+            } else if (type === 'perjanjian') {
+                document.getElementById('genNoSurat').value = "056/RPM-PRJ/VI/2026";
+                document.getElementById('genLampiran').value = "-";
+                document.getElementById('genPerihal').value = "Surat Perjanjian Kerjasama Program";
+                document.getElementById('genTujuan').value = "Pihak Kedua / Mitra Pelaksana di Tempat";
+                document.getElementById('genIsi').value = "Berdasarkan kesepakatan bersama antara Rumah Pemberdayaan Masyarakat (RPM) dengan Pihak Kedua, disepakati perjanjian kerjasama pelaksanaan program pemberdayaan ekonomi warga dengan ketentuan hak dan kewajiban masing-masing pihak yang telah disepakati bersama.";
+            }
+            // Trigger update
+            ['genNoSurat', 'genLampiran', 'genPerihal', 'genTujuan', 'genIsi', 'genTempat', 'genKetua', 'genSekretaris'].forEach(id => {
+                document.getElementById(id).dispatchEvent(new Event('input'));
+            });
+            showAlert('Template surat berhasil dimuat!');
+        }
+
+        // Render All Data & Statistics
+        function renderAll() {
+            renderDashboard();
+            renderWarga();
+            renderProgram();
+            renderKeuangan();
+            renderInventaris();
+            renderSurat();
+        }
+
+        function renderDashboard() {
+            document.getElementById('statWarga').innerText = db.warga.length;
+            document.getElementById('statProgram').innerText = db.program.length;
+            
+            let totalMasuk = db.keuangan.filter(k => k.tipe === 'Masuk').reduce((a, b) => a + Number(b.jumlah), 0);
+            let totalKeluar = db.keuangan.filter(k => k.tipe === 'Keluar').reduce((a, b) => a + Number(b.jumlah), 0);
+            let saldo = totalMasuk - totalKeluar;
+            document.getElementById('statSaldo').innerText = formatRupiah(saldo);
+
+            let totalBarang = db.inventaris.reduce((a, b) => a + Number(b.jumlah), 0);
+            document.getElementById('statInventaris').innerText = totalBarang;
+        }
+
+        function renderWarga() {
+            const tbody = document.getElementById('tableWargaBody');
+            tbody.innerHTML = '';
+            if (db.warga.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada data warga.</td></tr>`;
+                return;
+            }
+            db.warga.forEach((w, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 font-medium text-slate-500">${index + 1}</td>
+                        <td class="py-3.5 px-6 font-semibold text-slate-900">${w.nama}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${w.nik}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${w.telp}</td>
+                        <td class="py-3.5 px-6 text-slate-600"><span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">${w.keahlian}</span></td>
+                        <td class="py-3.5 px-6 text-center no-print">
+                            <button onclick="editData('warga', ${index})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg mr-1 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteData('warga', ${index})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderProgram() {
+            const tbody = document.getElementById('tableProgramBody');
+            tbody.innerHTML = '';
+            if (db.program.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada program pelatihan.</td></tr>`;
+                return;
+            }
+            db.program.forEach((p, index) => {
+                let badgeColor = p.status === 'Aktif' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 font-medium text-slate-500">${index + 1}</td>
+                        <td class="py-3.5 px-6 font-semibold text-slate-900">${p.nama}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${p.kategori}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${p.jadwal}</td>
+                        <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-lg text-xs font-medium ${badgeColor}">${p.status}</span></td>
+                        <td class="py-3.5 px-6 text-center no-print">
+                            <button onclick="editData('program', ${index})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg mr-1 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteData('program', ${index})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderKeuangan() {
+            const tbody = document.getElementById('tableKeuanganBody');
+            tbody.innerHTML = '';
+            if (db.keuangan.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada catatan keuangan.</td></tr>`;
+                return;
+            }
+            db.keuangan.forEach((k, index) => {
+                let isMasuk = k.tipe === 'Masuk';
+                let typeBadge = isMasuk ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700';
+                let amountColor = isMasuk ? 'text-blue-600 font-semibold' : 'text-rose-600 font-semibold';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 text-slate-600">${k.tanggal}</td>
+                        <td class="py-3.5 px-6 font-semibold text-slate-900">${k.keterangan}</td>
+                        <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-lg text-xs font-medium ${typeBadge}">${k.tipe}</span></td>
+                        <td class="py-3.5 px-6 ${amountColor}">${isMasuk ? '+' : '-'} ${formatRupiah(k.jumlah)}</td>
+                        <td class="py-3.5 px-6 text-center no-print">
+                            <button onclick="editData('keuangan', ${index})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg mr-1 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteData('keuangan', ${index})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderInventaris() {
+            const tbody = document.getElementById('tableInventarisBody');
+            tbody.innerHTML = '';
+            if (db.inventaris.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada data inventaris.</td></tr>`;
+                return;
+            }
+            db.inventaris.forEach((i, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 font-medium text-slate-500">${index + 1}</td>
+                        <td class="py-3.5 px-6 font-semibold text-slate-900">${i.nama}</td>
+                        <td class="py-3.5 px-6 text-slate-600"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium">${i.kondisi}</span></td>
+                        <td class="py-3.5 px-6 font-bold text-slate-900">${i.jumlah} Unit</td>
+                        <td class="py-3.5 px-6 text-center no-print">
+                            <button onclick="editData('inventaris', ${index})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg mr-1 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteData('inventaris', ${index})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderSurat() {
+            const tbody = document.getElementById('tableSuratBody');
+            tbody.innerHTML = '';
+            if (!db.surat || db.surat.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada arsip surat.</td></tr>`;
+                return;
+            }
+            db.surat.forEach((s, index) => {
+                let isMasuk = s.jenis === 'Surat Masuk';
+                let badgeColor = isMasuk ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 text-slate-600">${s.tanggal}</td>
+                        <td class="py-3.5 px-6 font-semibold text-slate-900">${s.nomor}</td>
+                        <td class="py-3.5 px-6"><span class="px-2.5 py-1 rounded-lg text-xs font-medium ${badgeColor}">${s.jenis}</span></td>
+                        <td class="py-3.5 px-6 text-slate-900">${s.perihal}</td>
+                        <td class="py-3.5 px-6 text-slate-600">${s.asalTujuan}</td>
+                        <td class="py-3.5 px-6 text-center no-print">
+                            <button onclick="editData('surat', ${index})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg mr-1 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteData('surat', ${index})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Modal Form Handling
+        function openModal(type, index = -1) {
+            document.getElementById('dataModal').classList.remove('hidden');
+            document.getElementById('formType').value = type;
+            document.getElementById('formIndex').value = index;
+            
+            const titleEl = document.getElementById('modalTitle');
+            const fieldsEl = document.getElementById('modalFields');
+            fieldsEl.innerHTML = '';
+
+            let item = index !== -1 ? db[type][index] : {};
+
+            if (type === 'warga') {
+                titleEl.innerText = index === -1 ? 'Tambah Warga Baru' : 'Edit Data Warga';
+                fieldsEl.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Lengkap</label>
+                        <input type="text" id="w_nama" required value="${item.nama || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">NIK (Nomor Induk Kependudukan)</label>
+                        <input type="text" id="w_nik" required value="${item.nik || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">No. Telepon / WhatsApp</label>
+                        <input type="text" id="w_telp" required value="${item.telp || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Keahlian / Pelatihan yang diikuti</label>
+                        <input type="text" id="w_keahlian" required value="${item.keahlian || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                `;
+            } else if (type === 'program') {
+                titleEl.innerText = index === -1 ? 'Tambah Program Pelatihan' : 'Edit Program Pelatihan';
+                fieldsEl.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Program</label>
+                        <input type="text" id="p_nama" required value="${item.nama || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kategori</label>
+                        <input type="text" id="p_kategori" required value="${item.kategori || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jadwal Pelaksanaan</label>
+                        <input type="text" id="p_jadwal" required value="${item.jadwal || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status</label>
+                        <select id="p_status" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Aktif" ${item.status === 'Aktif' ? 'selected' : ''}>Aktif</option>
+                            <option value="Perencanaan" ${item.status === 'Perencanaan' ? 'selected' : ''}>Perencanaan</option>
+                            <option value="Selesai" ${item.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                        </select>
+                    </div>
+                `;
+            } else if (type === 'keuangan') {
+                titleEl.innerText = index === -1 ? 'Tambah Transaksi Keuangan' : 'Edit Transaksi Keuangan';
+                fieldsEl.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal</label>
+                        <input type="date" id="k_tanggal" required value="${item.tanggal || new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Keterangan Transaksi</label>
+                        <input type="text" id="k_keterangan" required value="${item.keterangan || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tipe Transaksi</label>
+                        <select id="k_tipe" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Masuk" ${item.tipe === 'Masuk' ? 'selected' : ''}>Kas Masuk (Dana/Donasi)</option>
+                            <option value="Keluar" ${item.tipe === 'Keluar' ? 'selected' : ''}>Kas Keluar (Belanja/Operasional)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jumlah (Rp)</label>
+                        <input type="number" id="k_jumlah" required value="${item.jumlah || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                `;
+            } else if (type === 'inventaris') {
+                titleEl.innerText = index === -1 ? 'Tambah Barang Inventaris' : 'Edit Barang Inventaris';
+                fieldsEl.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Barang</label>
+                        <input type="text" id="i_nama" required value="${item.nama || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kondisi Barang</label>
+                        <select id="i_kondisi" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Baik" ${item.kondisi === 'Baik' ? 'selected' : ''}>Baik</option>
+                            <option value="Perbaikan" ${item.kondisi === 'Perbaikan' ? 'selected' : ''}>Perbaikan</option>
+                            <option value="Rusak" ${item.kondisi === 'Rusak' ? 'selected' : ''}>Rusak</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jumlah Unit</label>
+                        <input type="number" id="i_jumlah" required value="${item.jumlah || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                `;
+            } else if (type === 'surat') {
+                titleEl.innerText = index === -1 ? 'Catat Arsip Surat Baru' : 'Edit Arsip Surat';
+                fieldsEl.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Surat</label>
+                        <input type="date" id="s_tanggal" required value="${item.tanggal || new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nomor Surat</label>
+                        <input type="text" id="s_nomor" required value="${item.nomor || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jenis Surat</label>
+                        <select id="s_jenis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Surat Masuk" ${item.jenis === 'Surat Masuk' ? 'selected' : ''}>Surat Masuk</option>
+                            <option value="Surat Keluar" ${item.jenis === 'Surat Keluar' ? 'selected' : ''}>Surat Keluar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Perihal</label>
+                        <input type="text" id="s_perihal" required value="${item.perihal || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Asal / Tujuan Surat</label>
+                        <input type="text" id="s_asalTujuan" required value="${item.asalTujuan || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('dataModal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('formType').value;
+            const index = parseInt(document.getElementById('formIndex').value);
+            
+            let obj = {};
+            if (type === 'warga') {
+                obj = {
+                    nama: document.getElementById('w_nama').value,
+                    nik: document.getElementById('w_nik').value,
+                    telp: document.getElementById('w_telp').value,
+                    keahlian: document.getElementById('w_keahlian').value
+                };
+            } else if (type === 'program') {
+                obj = {
+                    nama: document.getElementById('p_nama').value,
+                    kategori: document.getElementById('p_kategori').value,
+                    jadwal: document.getElementById('p_jadwal').value,
+                    status: document.getElementById('p_status').value
+                };
+            } else if (type === 'keuangan') {
+                obj = {
+                    tanggal: document.getElementById('k_tanggal').value,
+                    keterangan: document.getElementById('k_keterangan').value,
+                    tipe: document.getElementById('k_tipe').value,
+                    jumlah: Number(document.getElementById('k_jumlah').value)
+                };
+            } else if (type === 'inventaris') {
+                obj = {
+                    nama: document.getElementById('i_nama').value,
+                    kondisi: document.getElementById('i_kondisi').value,
+                    jumlah: Number(document.getElementById('i_jumlah').value)
+                };
+            } else if (type === 'surat') {
+                if (!db.surat) db.surat = [];
+                obj = {
+                    tanggal: document.getElementById('s_tanggal').value,
+                    nomor: document.getElementById('s_nomor').value,
+                    jenis: document.getElementById('s_jenis').value,
+                    perihal: document.getElementById('s_perihal').value,
+                    asalTujuan: document.getElementById('s_asalTujuan').value
+                };
+            }
+
+            if (index === -1) {
+                if (type === 'surat') db.surat.push(obj);
+                else db[type].push(obj);
+                showAlert('Data berhasil ditambahkan!');
+            } else {
+                if (type === 'surat') db.surat[index] = obj;
+                else db[type][index] = obj;
+                showAlert('Data berhasil diperbarui!');
+            }
+
+            saveDB();
+            closeModal();
+        }
+
+        function editData(type, index) {
+            openModal(type, index);
+        }
+
+        function deleteData(type, index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+                if (type === 'surat') db.surat.splice(index, 1);
+                else db[type].splice(index, 1);
+                saveDB();
+                showAlert('Data berhasil dihapus!');
+            }
+        }
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        }
+
+        function showAlert(msg) {
+            const alertBox = document.getElementById('customAlert');
+            document.getElementById('alertMessage').innerText = msg;
+            alertBox.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                alertBox.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
